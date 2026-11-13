@@ -19,6 +19,16 @@ class ActionResult(BaseModel):
     ok: bool
     message: str
     entry: dict[str, Any] | None = None
+    hitSummary: dict[str, Any] | None = None
+    data: dict[str, Any] | None = None
+
+
+class SearchPageResult(PageResult[dict]):
+    """数据检索列表：除分页数据外，还带一份与概览、命中接口同口径的命中摘要。"""
+
+    hitSummary: dict[str, Any] | None = None
+    metadataVersionTrace: list[dict[str, Any]] = Field(default_factory=list)
+    metadataVersion: int = 1
 
 
 class EntryPayload(BaseModel):

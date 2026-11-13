@@ -18,6 +18,10 @@
       </article>
     </div>
 
+    <p v-if="linkedTable" class="link-hint">
+      已按检索索引跳转定位到覆盖表：<strong>{{ linkedTable }}</strong>
+      <button class="link" type="button" @click="clearLinkedTable">查看全部</button>
+    </p>
     <form class="filter-bar" @submit.prevent="reload">
       <label v-for="field in filterFields" :key="field" class="filter-item">
         <span>{{ field }}</span>
@@ -64,6 +68,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { request } from '@/api/client'
 
@@ -78,8 +83,17 @@ const stats = [{"label": "血缘节点总数", "value": 0}, {"label": "已启用
 const rows = ref<Row[]>([])
 const total = ref(0)
 const errorMessage = ref('')
+const route = useRoute()
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
+
+const linkedTable = ref(String(route.query.table ?? ''))
+
+function clearLinkedTable() {
+  linkedTable.value = ''
+  delete filters.value.table
+  void reload()
+}
 
 function resetFilters() {
   filters.value = {}
@@ -126,5 +140,10 @@ async function reload() {
   }
 }
 
-onMounted(reload)
+onMounted(() => {
+  // 从检索影响视图跳转过来时带上覆盖表名，进入页面即按该表过滤
+  const table = String(route.query.table ?? '')
+  if (table) filters.value.table = table
+  void reload()
+})
 </script>

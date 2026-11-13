@@ -20,13 +20,14 @@ STATUSES = ["草稿", "待校验", "已启用", "已停用"]
 def list_entries(
     keyword: str | None = Query(default=None, description="按节点编号检索"),
     status: str | None = Query(default=None, description="草稿、待校验、已启用、已停用"),
+    table: str | None = Query(default=None, description="按关联表名筛选"),
     page: int = 1,
     size: int = 20,
 ) -> PageResult[dict]:
     """按节点编号与状态过滤血缘图谱列表；没有数据时返回空页，不报错。"""
     if size > 200:
         raise HTTPException(status_code=400, detail="每页最多 200 条，请缩小分页范围")
-    items, total = service.list_entries(keyword=keyword, status=status, page=page, size=size)
+    items, total = service.list_entries(keyword=keyword, status=status, table=table, page=page, size=size)
     return PageResult(items=items, total=total, page=page, size=size)
 
 
